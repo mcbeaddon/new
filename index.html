@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   Addons
+  </title>
+  <style>
+   :root {
+      --primary-color: #007BFF;
+      --secondary-color: #0056b3;
+      --accent-color: #1E90FF;
+      --background-dark: #0F0F1E;
+      --background-darker: #1A1A2F;
+      --background-gray: #2D2D4D;
+      --text-light: #FFF;
+      --text-dim: #B0B0FF;
+      --transparent-bg: rgba(26,26,47,0.9);
+      --border-color: rgba(0,123,255,0.2);
+      --glass-bg: rgba(0,123,255,0.05);
+      --section-spacing: 2rem;
+    }
+    @keyframes floatNoSpin {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes scaleUp {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideRight {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: calc(0.5rem + env(safe-area-inset-top)) 2rem 2rem;
+      background: linear-gradient(45deg, var(--background-dark), var(--background-darker), var(--background-gray));
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+    .global-search-bar {
+      width: min(90%, 250px);
+      padding: 0.5rem 1.5rem;
+      margin: 0.5rem 0;
+      border: 1px solid var(--border-color);
+      border-radius: 50px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      color: var(--text-light);
+      font-size: 1rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    .global-search-bar:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 15px rgba(0,123,255,0.2);
+    }
+    .logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 2rem 0;
+      border: 3px solid var(--primary-color);
+      box-shadow: 0 0 30px rgba(0,123,255,0.3);
+      animation: floatNoSpin 4s ease-in-out infinite;
+      transition: transform 0.3s ease;
+    }
+    .logo:hover {
+      transform: scale(1.05);
+    }
+    .logo:focus {
+      outline: none;
+      border: 3px solid var(--primary-color);
+    }
+    .lobby-link {
+      display: block;
+      text-align: center;
+      margin-bottom: 1rem;
+      text-decoration: none;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00c3ff;
+      text-shadow: 0 0 10px rgba(0,123,255,0.5);
+    }
+    .folder-container {
+      background: var(--transparent-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      overflow: hidden;
+      animation: scaleUp 0.6s cubic-bezier(0.23,1,0.32,1);
+    }
+    #mainSection {
+      width: min(90%, 250px);
+      margin: 1rem auto;
+      text-align: center;
+    }
+    .hidden-section {
+      display: none;
+      width: min(90%, 450px);
+      margin: 2rem auto;
+      text-align: center;
+    }
+    .hidden-section:focus {
+      outline: none;
+    }
+    .folder-header {
+      padding: 1.5rem;
+      background: var(--glass-bg);
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      position: relative;
+      color: var(--text-light);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .clickable {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1.25rem 2rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      margin: 0.5rem;
+    }
+    .clickable::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 3px;
+      height: 0;
+      background: var(--primary-color);
+      transition: height 0.3s ease;
+    }
+    .clickable:hover {
+      background: var(--glass-bg);
+      padding-left: 2.5rem;
+    }
+    .clickable:hover::before {
+      height: 100%;
+    }
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      margin: 1.5rem;
+      border: none;
+      border-radius: 50px;
+      background: var(--primary-color);
+      color: #FFF;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+    }
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+    }
+    .section {
+      margin: 1.5rem;
+      padding: 1.5rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 15px;
+      animation: slideIn 0.4s ease;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: var(--text-light);
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .download-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      border-radius: 8px;
+      text-decoration: none;
+      color: #FFF;
+      transition: transform 0.3s ease;
+    }
+    .download-badge:hover {
+      transform: translateY(-2px);
+    }
+    .search-bar {
+      width: 80%;
+      padding: 0.75rem 1rem;
+      margin: 1rem auto;
+      border: 1px solid var(--border-color);
+      border-radius: 50px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      color: var(--text-light);
+      font-size: 1rem;
+      font-weight: bold;
+      text-align: center;
+      animation: slideRight 0.4s ease;
+    }
+    .preview-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 1rem auto;
+      border-radius: 10px;
+    }
+    @media(max-width:768px){
+      .folder-container { border-radius: 15px; }
+      .clickable { padding: 1rem 1.5rem; }
+      .hidden-section { width: 98%; }
+      #section1 .section,
+      #section2 .section,
+      #section3 .section,
+      #section4 .section,
+      #section5 .section,
+      #section6 .section,
+      #section7 .section,
+      #section8 .section,
+      #section9 .section,
+      #section10 .section,
+      #section11 .section,
+      #section12 .section,
+      #section13 .section,
+      #section14 .section,
+      #section15 .section,
+      #allSection .section {
+         margin: 1rem auto;
+         padding: 0.5rem;
+      }
+      #section1 .section .preview-image,
+      #section2 .section .preview-image,
+      #section3 .section .preview-image,
+      #section4 .section .preview-image,
+      #section5 .section .preview-image,
+      #section6 .section .preview-image,
+      #section7 .section .preview-image,
+      #section8 .section .preview-image,
+      #section9 .section .preview-image,
+      #section10 .section .preview-image,
+      #section11 .section .preview-image,
+      #section12 .section .preview-image,
+      #section13 .section .preview-image,
+      #section14 .section .preview-image,
+      #section15 .section .preview-image,
+      #allSection .section .preview-image {
+         width: calc(100% + 1rem);
+         margin-left: -0.5rem;
+         margin-right: -0.5rem;
+         margin-bottom: -0.5rem;
+      }
+      #section1 .search-bar,
+      #section2 .search-bar,
+      #section3 .search-bar,
+      #section4 .search-bar,
+      #section5 .search-bar,
+      #section6 .search-bar,
+      #section7 .search-bar,
+      #section8 .search-bar,
+      #section9 .search-bar,
+      #section10 .search-bar,
+      #section11 .search-bar,
+      #section12 .search-bar,
+      #section13 .search-bar,
+      #section14 .search-bar,
+      #section15 .search-bar,
+      #allSection .search-bar { width: 60%; }
+    }
+    @media(min-width:769px){
+      #section1 .section,
+      #section2 .section,
+      #section3 .section,
+      #section4 .section,
+      #section5 .section,
+      #section6 .section,
+      #section7 .section,
+      #section8 .section,
+      #section9 .section,
+      #section10 .section,
+      #section11 .section,
+      #section12 .section,
+      #section13 .section,
+      #section14 .section,
+      #section15 .section,
+      #allSection .section { padding: 0.5rem; }
+      #section1 .section .preview-image,
+      #section2 .section .preview-image,
+      #section3 .section .preview-image,
+      #section4 .section .preview-image,
+      #section5 .section .preview-image,
+      #section6 .section .preview-image,
+      #section7 .section .preview-image,
+      #section8 .section .preview-image,
+      #section9 .section .preview-image,
+      #section10 .section .preview-image,
+      #section11 .section .preview-image,
+      #section12 .section .preview-image,
+      #section13 .section .preview-image,
+      #section14 .section .preview-image,
+      #section15 .section .preview-image,
+      #allSection .section .preview-image {
+         width: calc(100% + 1rem);
+         margin-left: -0.5rem;
+         margin-right: -0.5rem;
+         margin-bottom: -0.5rem;
+      }
+      #section1 .search-bar,
+      #section2 .search-bar,
+      #section3 .search-bar,
+      #section4 .search-bar,
+      #section5 .search-bar,
+      #section6 .search-bar,
+      #section7 .search-bar,
+      #section8 .search-bar,
+      #section9 .search-bar,
+      #section10 .search-bar,
+      #section11 .search-bar,
+      #section12 .search-bar,
+      #section13 .search-bar,
+      #section14 .search-bar,
+      #section15 .search-bar,
+      #allSection .search-bar { width: 60%; }
+    }
+    @media(prefers-reduced-motion:reduce){
+      * { animation: none!important; transition: none!important; }
+    }
+  </style>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <script src="https://publisher.linkvertise.com/cdn/linkvertise.js">
+  </script>
+  <script>
+   linkvertise(380136, {whitelist: [], blacklist: [""]});
+  </script>
+ </head>
+ <body>
+  <input class="global-search-bar" onkeyup="globalSearch(this.value)" placeholder="🔍 Search..." type="text"/>
+  <!-- Clickable logo directing to the new link -->
+  <a href="https://mcbeclient.github.io/dl/">
+   <img alt="Logo" class="logo" src="https://i.pinimg.com/736x/d3/1d/07/d31d07313f89289e06d6cae9a38d998e.jpg" tabindex="0"/>
+  </a>
+  <a class="lobby-link" href="https://yashofree.github.io/link/">
+   Home
+  </a>
+  <div class="folder-container" id="mainSection">
+   <div class="folder-header">
+    <i class="fas fa-folder-open">
+    </i>
+    Addons
+   </div>
+   <!-- New clickable for All -->
+   <div class="clickable" onclick="showAllItems()">
+    <i class="fas fa-globe">
+    </i>
+    All
+   </div>
+   <div class="clickable" onclick="showSection('section1')">
+    <i class="fas fa-tools">
+    </i>
+    Utilities
+   </div>
+   <div class="clickable" onclick="showSection('section10')">
+    <i class="fas fa-heart">
+    </i>
+    Survivals
+   </div>
+   <div class="clickable" onclick="showSection('section8')">
+    <i class="fas fa-star">
+    </i>
+    Visuals
+   </div>
+   <div class="clickable" onclick="showSection('section2')">
+    <i class="fas fa-gun">
+    </i>
+    Weapons
+   </div>
+   <div class="clickable" onclick="showSection('section3')">
+    <i class="fas fa-skull">
+    </i>
+    Bosses
+   </div>
+   <div class="clickable" onclick="showSection('section4')">
+    <i class="fas fa-film">
+    </i>
+    Animes
+   </div>
+   <div class="clickable" onclick="showSection('section5')">
+    <i class="fas fa-ghost">
+    </i>
+    Horrors
+   </div>
+   <div class="clickable" onclick="showSection('section6')">
+    <i class="fas fa-car">
+    </i>
+    Vehicles
+   </div>
+   <div class="clickable" onclick="showSection('section7')">
+    <i class="fas fa-chair">
+    </i>
+    Furnitures
+   </div>
+   <div class="clickable" onclick="showSection('section9')">
+    <i class="fas fa-house">
+    </i>
+    Structures
+   </div>
+   <!-- New clickable for Marketplace -->
+   <div class="clickable" onclick="window.location.href = 'https://craftydlc.github.io/v2/'">
+    <i class="fas fa-shopping-cart">
+    </i>
+    Marketplace
+   </div>
+  </div>
+  <!-- Hidden sections -->
+  <div class="hidden-section" id="section1">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; text-shadow: 0 0 10px rgba(0,195,255,0.5); font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-tools">
+    </i>
+    <br/>
+    Utilities
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section1')" placeholder="🔍 Search..." type="text"/>
+   <div class="section">
+    <div class="section-title">
+     Item Physics
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/tqr6z7tlxpfjclo/Item_Physics.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Item Physics" class="preview-image" loading="lazy" src="https://i.ibb.co/0pT4gsZj/IMG-20241231-011540-640-1.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Minemote
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/4r8tcjzzwqgfspe/Mine+Emote.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Minemote" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/vQ7X3FUDr5Q/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Minimap
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/xnu3bkpoxv2bj4a/Minimap+Addon+1.0.1.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Minimap" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/l4uV2pwB994/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Minecraft Essentials
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/a3lta8vzkrg6xhy/Minecraft+Essentials+v2.13.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Minecraft Essentials" class="preview-image" loading="lazy" src="https://i.ibb.co/rffb8t8n/hqdefault-2.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Leaf Essentials
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/8jzev4v8bagslls/Leaf+v2.2.1.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Leaf Essentials" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/BWrBM75ptdE/maxresdefault.jpg"/>
+   </div>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section2">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; text-shadow: 0 0 10px rgba(0,195,255,0.5); font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-gun">
+    </i>
+    <br/>
+    Weapons
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section2')" placeholder="🔍 Search..." type="text"/>
+   <div class="section">
+    <div class="section-title">
+     Moonblade Magic
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/v9q9apr5hrbmj84/Moonblade+Magic+1-21-6.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Moonblade Magic" class="preview-image" loading="lazy" src="https://i.ibb.co/HDSDk0S9/photo-2025-03-16-14-22-38.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Shounen De. Fantasy V3 P2
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/c6d0a036p1z2ilp/Shounen+De.+Fantasy+V3+P2.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Shounen De. Fantasy V3 P2" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/eKTaxYJiQ18/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Shadow Company V0.15
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/uh6m0j1731rqy6w/Shadow_Company_V0.15.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Shadow Company V0.15" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/a9Gv3bVRNtI/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Baelroth Spear
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/ganuc35pdp1zpzm/Baelroth_Spear.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Baelroth Spear" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/z4WpW0yWjVc/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Fhantorm Katana
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/aru04821679m9w8/Fhantorm_Katana.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Fhantorm Katana" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/8m19bKQp4sM/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Radium's Armament 3.0
+    </div>
+    <a class="download-badge" href="https://mega.nz/file/uN42FB4R#GcOLeZ1xnvj8_buYnblUXVRgeTV55eJ2uhxr2ZT1LQQ" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Radium's Armament 3.0" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/Frpvi8j4NbM/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Barbarian Cleaver
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/skhy3wdik9htms1/Barbarian_Cleaver_RPG.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Barbarian Cleaver" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/lC8CdC4yOlg/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Asura Sword
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/fik1v3q28r906tl/Asura_Sword_RPG.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Asura Sword" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/996MfGNrpXU/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Blood Dagger
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/mtm72br21oh5dzs/Blood_Dager_addon.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Blood Dagger" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/qG2jzsT7JG8/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Solvyne Radiant Tome
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/kxzl8kaf9bcmgwc/Solvyne_Radiant_Tome_RPGW_V1.4.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Solvyne Radiant Tome" class="preview-image" loading="lazy" src="https://i.ibb.co/Xxk93NSc/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Firecracker Spear
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/ywcam544eypzux3/Firecracker_Spear_RPGW_V1.3.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Firecracker Spear" class="preview-image" loading="lazy" src="https://i.ibb.co/nMRFwwxk/2maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Sculk Crossbow
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/7g96f67t9ph8seq/Sculk_Crossbow_RPGW_V1.2.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Sculk Crossbow" class="preview-image" loading="lazy" src="https://i.ibb.co/MqH5C4v/3maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Spirit Dagger
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/ck55aslvf45wi64/Spirit_Dagger_RPGW_V1.1.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Spirit Dagger" class="preview-image" loading="lazy" src="https://i.ibb.co/xKKCc5DK/4maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Frost Katana
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/y81pmeb7xec00gf/Frost_Katana_RPGW_V1.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Frost Katana" class="preview-image" loading="lazy" src="https://i.ibb.co/hF4N7MYY/5maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Brutal Legends V2
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/uylvumpwqh56vgk/Brutal_Legend_V2.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Brutal Legends V2" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/HHJE_9UhFoM/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Aplok Guns
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/z29guc00acouqws/Aplok+Guns+Add-On.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Aplok Guns" class="preview-image" loading="lazy" src="https://i.ibb.co/0p19CKBm/photo-2025-03-09-16-39-46.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Soul Demonic
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/9da9e7ltym05p46/Soul_Demonic_By_%2540Dyfrii.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Soul Demonic" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/4zaILBhUocQ/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Vodkerfist
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/xj8b09ljr5l1v53/Addon_RPG_Class_Vodkerfist_MCPE_1.21%252B%2528by_%2540DyrDev%2529.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Vodkerfist" class="preview-image" loading="lazy" src="https://i.ibb.co/gLNHHd6g/hqdefault-3.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Blue Archive
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/pc6sz59ky63ao87/blue+archive+V3.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Blue Archive" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/ojrl2bKyGFA/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Elemental 2.0 V8
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/7laa4oxt3stri5z/Elemental+2.0+V8.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Elemental 2.0 V8" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/rz9c5-1FH90/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Elemental 2.0 V7
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/coqpxtro2ztvcyk/Elemental+2.0+V7.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Elemental 2.0 V7" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/FbekcPcUu9I/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Elemental 2.0 V6
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/n74a8cs5ed54dzi/Elemental+2.0+V6.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Elemental 2.0 V6" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/tnQ6lbdC_LY/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Shounen De. Fantasy V3 P1
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/oa5xcpc4do53tyx/Shounen+De+Fantasy.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Shounen De. Fantasy V3 P1" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/dF2vbf0p7_k/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Actual Guns C50
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/1v1qyymabouy1do/ADDON_GUN_V1.12_3D.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Actual Guns C50" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/4OYrDHpQGSg/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     BattleCraft V2
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/l8sl03vtby1mu0h/BattleCraft2.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="BattleCraft V2" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/TZKayeXhyeI/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Shadow Company V0.1
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/81yxvcajicqm637/Shadow+Company+V0.1.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Shadow Company V0.1" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/a9Gv3bVRNtI/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Timeless And Classic Zero
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/a1tiq1sep9i0axl/Happy_new_year.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Timeless And Classic Zero" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/xhJdSY5HLoU/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Radium's Armament V2.9
+    </div>
+    <a class="download-badge" href="https://mega.nz/file/jRwCUT7L#nPq2T9bRdhGd41s0F_5epO5chKNRSCp-VTHJV4OFLl4" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Radium's Armament V2.9" class="preview-image" loading="lazy" src="https://d1wzdj81h1hubn.cloudfront.net/resources/93b0bc71b4a09dea.jpeg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Radium's Armament V2.8
+    </div>
+    <a class="download-badge" href="https://mega.nz/file/OJBAUBYQ#JE_ywlfHxVaHaSf2WEcRVIOvbiEp0RBpL0JmSyw-WWg" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Radium's Armament V2.8" class="preview-image" loading="lazy" src="https://d1wzdj81h1hubn.cloudfront.net/resources/dd0d5c6237166e8d.jpeg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Radium's Armament V2.7
+    </div>
+    <a class="download-badge" href="https://mega.nz/file/CUhUQDbD#iYhkrNAZWPMBxi3sNR_0tdb8sWlHDYL_nUlRFZwZxww" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Radium's Armament V2.7" class="preview-image" loading="lazy" src="https://d1wzdj81h1hubn.cloudfront.net/resources/ea90855bf310bbba.jpeg"/>
+   </div>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section3">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; text-shadow: 0 0 10px rgba(0,195,255,0.5); font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-skull">
+    </i>
+    <br/>
+    Bosses
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section3')" placeholder="🔍 Search..." type="text"/>
+   <div class="section">
+    <div class="section-title">
+     Trial Of Great
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/v1mlrqtgort1g2d/Trial_Of_Great_v.1.0_By_TELUR_-Man.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Trial Of Great" class="preview-image" loading="lazy" src="https://i.ibb.co/LdctgKcN/img.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Ignis Boss
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/uojcow0zfm30uk2/Ignis+Boss.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Ignis Boss" class="preview-image" loading="lazy" src="https://i.ibb.co/s9fTpF7Q/ignis.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Kaiju Craft V4.5
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/gln54q44rwmqbmg/Kaiju_craft_Adddon_bygojidraw_version4.5.mcaddon" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Kaiju Craft V4.5" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/Ds7-jiV76CA/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Kaiju Craft V4
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/3559cmz0f5tzqz0/Kaiju_craft_Adddon_bygojidraw_version4.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Kaiju Craft V4" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/bs1vsAvwXKo/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Mutant Creatures V4.2
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/eulz2a1q4zky545/Mutant+Creatures+V4.2.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Mutant Creatures V4.2" class="preview-image" loading="lazy" src="https://i.ibb.co/s9jNk44V/photo-2025-02-27-07-14-13-1.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Kaiju Craft V3
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/2biyxyelwdphipb/Kaiju_craft_Adddon_bygojidraw_version3.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Kaiju Craft V3" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/ctg0j0l_GDI/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     EF Wither Storm
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/ada7ieik320si92/EF+Wither+Storm+TranHuyLong+" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="EF Wither Storm" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/l9IxV-OE0Is/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Wither Storm
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/4gayuqnjt5z730i/CWSBP_0.4.8_Hotfix_3.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Wither Storm" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/Ig-m2Yde-fE/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Monsterverse
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/19qhtb82jiod01a/Monsterverse+(Update).mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Monsterverse" class="preview-image" loading="lazy" src="https://i.ibb.co/k6c6pfLk/photo-2025-03-02-23-32-13.jpg"/>
+   </div>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section4">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; text-shadow: 0 0 10px rgba(0,195,255,0.5); font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-film">
+    </i>
+    <br/>
+    Animes
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section4')" placeholder="🔍 Search..." type="text"/>
+   <!-- iOS section currently has no items -->
+   <div class="section">
+    <div class="section-title">
+     Dragon Block Magic
+    </div>
+    <a class="download-badge" href="https://teamterra0.yolasite.com/add-ons/" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Dragon Block Magic" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/FQTEcGJCvAs/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Titan Craft
+    </div>
+    <a class="download-badge" href="https://teamterra0.yolasite.com/add-ons/" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Titan Craft" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/1Qwcv1DGZSM/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Seven Deadly Sins
+    </div>
+    <a class="download-badge" href="https://teamterra0.yolasite.com/add-ons/" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Seven Deadly Sins" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/m7h7Z_utYZ0/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Ben 10 Craft
+    </div>
+    <a class="download-badge" href="https://teamterra0.yolasite.com/add-ons/" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Ben 10 Craft" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/4eC34CNVbrA/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Hunter X Hunter
+    </div>
+    <a class="download-badge" href="https://teamterra0.yolasite.com/add-ons/" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Hunter X Hunter" class="preview-image" loading="lazy" src="https://i.ibb.co/9mSjRTBK/hxh.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Death Craft
+    </div>
+    <a class="download-badge" href="https://teamterra0.yolasite.com/add-ons/" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Death Craft" class="preview-image" loading="lazy" src="https://i.ibb.co/whq501Cb/death.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Pixelmon
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/n1mux8xbv9pwaih/Pixelmon.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Pixelmon" class="preview-image" loading="lazy" src="https://i.ibb.co/fGSy9wNz/Logo-Pokedrock-1.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Spider Man
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/evv8znr1tzcjvxc/Spider+Man+Add-On.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Spider Man" class="preview-image" loading="lazy" src="https://i.ibb.co/DHZ4Yshp/photo-2025-03-01-19-52-25.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Kamen Rider Battle Craft
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/8esurq0u57fwqcv/Addon_Kamen_Rider_Battle_Craft.mcaddon/file?dkey=8esurq0u57fwqcv" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Kamen Rider Battle Craft" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/dhMQWWn9E3Q/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Dandadan
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/8mk1fk9dcjt4zih/Dandadan.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Dandadan" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/XjcnCtWuhyc/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Shadow Samurai
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/1o3g65n3kh40m0p/shadow.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Shadow Samurai" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/j2saUaB-SK8/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Dragon Ball
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/bv59h9cxjm2jjej/Dragon+Ball.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Dragon Ball" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/yAxdVN6LRmY/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Naruto Craft V7
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/j7yd11kk0ti5f28/Naruto.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Naruto Craft V7" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/yNfF0u5Miws/maxresdefault.jpg"/>
+   </div>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <!-- Sections 5 to 15 as empty placeholders -->
+  <div class="hidden-section" id="section5">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-ghost">
+    </i>
+    <br/>
+    Horrors
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section5')" placeholder="🔍 Search..." type="text"/>
+   <div class="section">
+    <div class="section-title">
+     The Watching Nightmare
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/kuoo3wj0er6eok6/%25C2%25A74The_Watching_Nightmare_%25C2%25A73To_Bedrock.mcaddon.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Watching Nightmare" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/SJZdOOTzHas/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Reborn From The Mist
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/rqc0lwg7hqkmu0c/%25C2%25A78Reborn_From_The_Mist_%25C2%25A73To_Bedrock.mcaddon.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Reborn From The Mist" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/EoECN1GFLH8/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     That's Not A Deer
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/w2rjtj9xykol571/%25C2%25A72thats_not_a_deer_%25C2%25A77to_Bedrock_released_by_Dixer.mcaddon.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="That's Not A Deer" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/Y0QpFEzvZCc/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     The Mimicer Upgrade
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/a1ua4cfnryskuad/%25C2%25A73The_Mimicer_%25C2%25A74upgrade_to_bedrock_by_Dixer.mcaddon.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Mimicer Upgrade" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/uc4oim07mbw/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     The Man From The Shadow
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/e1175tuzqh3mzh5/%25C2%25A70The_Man_From_The_Shadow_%25C2%25A73To_Bedrock_By_Dixer.mcaddon.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Man From The Shadow" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/FVeMSoUv3Dc/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     In Your World
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/bema4msrtrb5x8v/%25C2%25A74In_Your_World_%25C2%25A73To_Bedrock_By_Dixer.mcaddon.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="In Your World" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/Lk6d_0aGR9A/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     The Intruder
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/ll2n1m4gwqlygki/%25C2%25A70The_Intruder_-_%2528Horror%2529%25C2%25A73_To_Bedrock_By_Dixer.mcaddon.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Intruder" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/0na9N1JL-5I/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     The Spineclaw
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/531eszfzllkia5j/The_Spineclaw_%2528dweller%2529_%2528bedrock%2529_By_Dixer.mcaddon.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Spineclaw" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/4gz475Mq8d4/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Cartoon Dweller
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/o0pp2dhibfdh25d/Cartoon_Dweller_To_Bedrock_By_Dixer.mcaddon.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Cartoon Dweller" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/ckdJqFRibcc/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     The Slasher
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/ojfk8abk06knz7k/%25C2%25A74The_Slasher_Bedrock.mcaddon.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Slasher" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/o4Gu_26Yy7M/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     The Man in White
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/941ubcj8j78o0sc/The+Man+in+White.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Man in White" class="preview-image" loading="lazy" src="https://i.ibb.co/WNbgpvnL/The-Man-in-White.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Shut Your Eyes
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/o0na42ib8lbpjbs/Shut+Your+Eyes.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Shut Your Eyes" class="preview-image" loading="lazy" src="https://i.ibb.co/B5tt3CzJ/Shut-Your-Eyes.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     From The Fog V9
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/z8dounsgpn8a1vb/From_The_Fog_V9.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="From The Fog V9" class="preview-image" loading="lazy" src="https://i.ibb.co/r2wW61T4/sigma.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Five Nights At Freddy's
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/fv4sbrwl7yfvut4/Five+Nights+At+Freddys+Add-On.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Five Nights At Freddy's" class="preview-image" loading="lazy" src="https://i.ibb.co/jZBFCj81/photo-2025-02-25-12-17-22.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Imitators
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/qt0q5jtwcz9hhsi/Â§4imitator+release+date+!!Â§4_1739089219578.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Imitators" class="preview-image" loading="lazy" src="https://i.ibb.co/1GNHRQVb/hqdefault-7.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Pale Hound
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/x1qhzj8nww03xhx/Â§4pale+Â§5houndÂ§6+v1_1740880310604.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Pale Hound" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/j_5TPv1Ne7U/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Goatman.Jar
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/zxjuy0okceedud7/Â§4the+goatman.jar_1740893627299.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Goatman.Jar" class="preview-image" loading="lazy" src="https://i.ibb.co/SXsNSq3r/hqdefault-6.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Yami Dweller
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/ifp5yz3tf1rz438/%25C2%25A74yami_%25C2%25A72dweller%25C2%25A75_1.21.1%25C2%25A76-1.21.60_1741098026935.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Yami Dweller" class="preview-image" loading="lazy" src="https://i.ibb.co/JRnZmwmm/hqdefault-4.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     The Anomaly
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/ugdrp7giqd2kl0o/The_Anomaly_V1.2_%25281.19_1.21%2529.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Anomaly" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/pgcAT5lN62w/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Sonic Eyx
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/li28f4byt9enlbc/SONIC+EYX+%28BY+CODX1NX%29_1733030811440.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Sonic Eyx" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/rlwj4ScyEjk/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     The Silhouette V3
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/inqovgklvdpl66k/The+Silhouette+BETA+By+Tolex909+V3.mcaddon/file?dkey=inqovgklvdpl66k" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Silhouette V3" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/aC_vBkZzNTM/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     God is Coming
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/l56cat39vp5fxso/The+God+(Port).mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="God is Coming" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/quparWek3-Y/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Night Powler
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/384cvjndme0dxit/The+Night+Prowler+V1.8+%281.19+1.20%29.mcaddon.zip/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Night Powler" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/NCcW1Uc-_Po/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Wendigo V2
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/51qcxg4fjr47rrq/Wendigo+V2.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Wendigo V2" class="preview-image" loading="lazy" src="https://i.ibb.co/YFqsczQF/hqdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Night Dweller V1.4
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/s0i5kd3l1pj094d/Night+Dweller++V1.4+(1.19+1.21).mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Night Dweller V1.4" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/7IeJdAN7xmA/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Cranker Dweller
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/4ip0n8ufxtsj77g/Cranker+Dweller+Update.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Cranker Dweller" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/cF7QWv-DZ2Q/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     The Irritator
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/a1z9qoi2qao00je/1The+Irritator.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Irritator" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/57qd70ORWiw/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     A Night Stalker
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/ky2lx2wbbpl781r/Night+Stalker.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="A Night Stalker" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/ob7eyt9RXSs/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     Jenny Dweller
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/e74mdr6qd6fn3re/Jenny+Dweller.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Jenny Dweller" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/oPDN0K8lmW8/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     The Boiled One
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/a2a8y0ov1qdxrog/Boiled+One.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Boiled One" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/V0bwdANMwrs/maxresdefault.jpg"/>
+   </div>
+   <div class="section">
+    <div class="section-title">
+     The Slender Man 3
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/ncteiwml90lmywh/The+Slenderman+3.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="The Slender Man 3" class="preview-image" loading="lazy" src="https://i.ibb.co/d42V1cyd/photo-2025-02-11-11-07-49.jpg"/>
+   </div>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section6">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-car">
+    </i>
+    <br/>
+    Vehicles
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section6')" placeholder="🔍 Search..." type="text"/>
+   <div class="section">
+    <div class="section-title">
+     Lamborghini Aventador SV
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/o5jqwwjy0gfeq5j/Lamborghini_Aventador_SV.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Lamborghini Aventador SV" class="preview-image" loading="lazy" src="https://i.ibb.co/VYq01HFt/photo-2024-12-25-12-38-30.jpg"/>
+   </div>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section7">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-chair">
+    </i>
+    <br/>
+    Furnitures
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section7')" placeholder="🔍 Search..." type="text"/>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section8">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-star">
+    </i>
+    <br/>
+    Visuals
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section8')" placeholder="🔍 Search..." type="text"/>
+   <div class="section">
+    <div class="section-title">
+     Butterflies
+    </div>
+    <a class="download-badge" href="https://www.jaycubtruth.com/uploads/1/4/0/6/140614680/butterflies_addon_by_jaycubtruth.mcaddon" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Butterflies" class="preview-image" loading="lazy" src="https://modbay.org/uploads/posts/2023-01/butterflies-by-jaycubtruth-cover.jpg"/>
+   </div>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section9">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-house">
+    </i>
+    <br/>
+    Structures
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section9')" placeholder="🔍 Search..." type="text"/>
+   <div class="section">
+    <div class="section-title">
+     Additional Structure
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/itk3olnp938103e/Additional+Structure+v0.1.mcpack/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Additional Structure" class="preview-image" loading="lazy" src="https://i.ibb.co/WWfvJYK6/photo-2025-03-11-06-28-13.jpg"/>
+   </div>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section10">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-heart">
+    </i>
+    <br/>
+    Survivals
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section10')" placeholder="🔍 Search..." type="text"/>
+   <div class="section">
+    <div class="section-title">
+     Ambient Sounds V5
+    </div>
+    <a class="download-badge" href="https://www.mediafire.com/file/t8x64vw5w0i2u2b/AmbientSoundsV5.mcaddon/file" target="_blank">
+     <i class="fas fa-download">
+     </i>
+     Download
+    </a>
+    <img alt="Ambient Sounds V5" class="preview-image" loading="lazy" src="https://img.youtube.com/vi/scGqry0yKas/maxresdefault.jpg"/>
+   </div>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section11">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-folder">
+    </i>
+    <br/>
+    Section 11
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section11')" placeholder="🔍 Search..." type="text"/>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section12">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-folder">
+    </i>
+    <br/>
+    Section 12
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section12')" placeholder="🔍 Search..." type="text"/>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section13">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-folder">
+    </i>
+    <br/>
+    Section 13
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section13')" placeholder="🔍 Search..." type="text"/>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section14">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-folder">
+    </i>
+    <br/>
+    Section 14
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section14')" placeholder="🔍 Search..." type="text"/>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <div class="hidden-section" id="section15">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-folder">
+    </i>
+    <br/>
+    Section 15
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'section15')" placeholder="🔍 Search..." type="text"/>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <!-- New hidden section for All -->
+  <div class="hidden-section" id="allSection">
+   <header style="text-align: center; margin: 2rem 0; color: #00c3ff; text-shadow: 0 0 10px rgba(0,195,255,0.5); font-size: 2rem; animation: slideDown 0.5s ease-out;">
+    <i class="fas fa-globe">
+    </i>
+    <br/>
+    All
+   </header>
+   <input class="search-bar" onkeyup="sectionSearch(this.value, 'allSection')" placeholder="🔍 Search..." type="text"/>
+   <div id="allItemsContainer">
+   </div>
+   <button class="back-button" onclick="goBack()" style="animation: slideUp 0.5s ease-out;">
+    <i class="fas fa-arrow-left">
+    </i>
+    Back
+   </button>
+  </div>
+  <script>
+   let searchTimeout;
+    function globalSearch(query) {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const normalizedQuery = query.toLowerCase().trim();
+        const mainSection = document.getElementById('mainSection');
+        const hiddenSections = document.getElementsByClassName('hidden-section');
+        let anyCardVisible = false;
+        
+        if (normalizedQuery === '') {
+          mainSection.style.display = "block";
+          Array.from(hiddenSections).forEach(container => {
+            container.style.display = "none";
+            const cards = container.querySelectorAll('.section');
+            cards.forEach(card => {
+              card.style.display = "block";
+            });
+          });
+          const noResultsElem = document.getElementById('noResults');
+          if (noResultsElem) noResultsElem.remove();
+        } else {
+          mainSection.style.display = "none";
+          Array.from(hiddenSections).forEach(container => {
+            let containerHasVisible = false;
+            const cards = container.querySelectorAll('.section');
+            cards.forEach(card => {
+              if (card.textContent.toLowerCase().includes(normalizedQuery)) {
+                card.style.display = "block";
+                containerHasVisible = true;
+                anyCardVisible = true;
+              } else {
+                card.style.display = "none";
+              }
+            });
+            container.style.display = containerHasVisible ? "block" : "none";
+          });
+          let noResultsElem = document.getElementById('noResults');
+          if (!anyCardVisible) {
+            if (!noResultsElem) {
+              noResultsElem = document.createElement('div');
+              noResultsElem.id = 'noResults';
+              noResultsElem.textContent = 'No results found.';
+              noResultsElem.style.color = 'var(--text-dim)';
+              noResultsElem.style.textAlign = 'center';
+              noResultsElem.style.marginTop = '1rem';
+              mainSection.parentNode.insertBefore(noResultsElem, mainSection.nextSibling);
+            }
+          } else if (noResultsElem) {
+            noResultsElem.remove();
+          }
+        }
+      }, 300);
+    }
+    
+    function sectionSearch(query, sectionId) {
+      const container = document.getElementById(sectionId);
+      const cards = container.querySelectorAll('.section');
+      const normalizedQuery = query.toLowerCase().trim();
+      let anyVisible = false;
+      cards.forEach(card => {
+        if (card.textContent.toLowerCase().includes(normalizedQuery)) {
+          card.style.display = "block";
+          anyVisible = true;
+        } else {
+          card.style.display = "none";
+        }
+      });
+      let noResultsElem = container.querySelector('.no-results');
+      if (!anyVisible) {
+        if (!noResultsElem) {
+          noResultsElem = document.createElement('div');
+          noResultsElem.className = 'no-results';
+          noResultsElem.textContent = 'No results found.';
+          noResultsElem.style.color = 'var(--text-dim)';
+          noResultsElem.style.textAlign = 'center';
+          noResultsElem.style.marginTop = '1rem';
+          container.appendChild(noResultsElem);
+        }
+      } else {
+        if (noResultsElem) {
+          noResultsElem.remove();
+        }
+      }
+    }
+    
+    function showSection(sectionId) {
+      document.getElementById('mainSection').style.display = "none";
+      const sections = document.getElementsByClassName('hidden-section');
+      for (let i = 0; i < sections.length; i++) {
+        sections[i].style.display = "none";
+      }
+      const section = document.getElementById(sectionId);
+      section.style.display = "block";
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      section.setAttribute('tabindex', '-1');
+      section.focus();
+    }
+    
+    function goBack() {
+      document.getElementById('mainSection').style.display = "block";
+      const sections = document.getElementsByClassName('hidden-section');
+      for (let i = 0; i < sections.length; i++) {
+        sections[i].style.display = "none";
+      }
+    }
+    
+    // Updated function to merge items from all sections (section1 to section15)
+    function showAllItems() {
+      document.getElementById('mainSection').style.display = "none";
+      const sections = document.getElementsByClassName('hidden-section');
+      for (let i = 0; i < sections.length; i++) {
+        sections[i].style.display = "none";
+      }
+      const allContainer = document.getElementById('allItemsContainer');
+      allContainer.innerHTML = "";
+      // Collect items from sections 1 through 15
+      const ids = ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8', 'section9', 'section10', 'section11', 'section12', 'section13', 'section14', 'section15'];
+      let allItems = [];
+      ids.forEach(function(id) {
+        const container = document.getElementById(id);
+        if (container) {
+          const items = container.querySelectorAll('.section');
+          items.forEach(function(item) {
+            allItems.push(item.cloneNode(true));
+          });
+        }
+      });
+      allItems.sort(() => Math.random() - 0.5);
+      allItems.forEach(function(item) {
+        allContainer.appendChild(item);
+      });
+      const allSection = document.getElementById('allSection');
+      allSection.style.display = "block";
+      allSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      allSection.setAttribute('tabindex', '-1');
+      allSection.focus();
+    }
+  </script>
+ </body>
+</html>
